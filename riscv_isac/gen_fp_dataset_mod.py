@@ -62,7 +62,7 @@ def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex repres
 		th = "0xFF800001"
 		return th
 	elif(float_no=="S"):
-		return "S"
+		return "0xFFFFFFFF"
 	elif(float_no=="#"):
 		return "#"
 	
@@ -217,20 +217,8 @@ def gen_fp_dataset(flen, opcode):
 							flags_dataset.append(flags_to_dec(l[len(l)-1]))
 			count=count+1
 			a=f.readline()
-	print("Iterated through",count,"lines of Test-cases for",opcode,"opcode to extract",len(rs1_dataset),"Test-points!")
-	print()
-	print("Unique values of rs1:",stats(rs1_dataset))
-	print()
-	print("---------------------------------------------------------------------------------------------------------------------")
-	print()
-	print("Unique values of rs2:",stats(rs2_dataset))
-	print()
-	print("---------------------------------------------------------------------------------------------------------------------")
-	print()
-	print("Unique values of rm:",stats(rm_dataset))
-	print()
-	print("---------------------------------------------------------------------------------------------------------------------")
-	print()
+	print("Iterated through",count,"lines of Test-cases in IBM Test Suite for",opcode,"opcode to extract",len(rs1_dataset),"Test-points!")
+
 	if(ops==2):
 		#return rs1_dataset,rs2_dataset,rd_dataset,rm_dataset,te_dataset,flags_dataset
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,'',rm_dataset)
