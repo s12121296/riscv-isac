@@ -1,3 +1,6 @@
+# See LICENSE.iitm for details
+
+from riscv_ctg.log import logger
 import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
@@ -132,9 +135,10 @@ def gen_fp_dataset(flen, opcode):
 	te_dataset=[]
 	flags_dataset=[]
 	count=0									# Initializing count of datapoints
-	for filename in os.listdir(os.getcwd()+'/test_suite'):
-		#with open(os.path.join(os.getcwd()+'/test_suite', filename), 'r') as f:
-		f=open(os.path.join(os.getcwd()+'/test_suite', filename), "r")
+	path_parent = os.path.dirname(os.getcwd())
+	os.chdir(path_parent)
+	for filename in os.listdir(os.getcwd()+'/riscv_isac/test_suite'):
+		f=open(os.path.join(os.getcwd()+'/riscv_isac/test_suite', filename), "r")
 		for i in range(5):
 			a=f.readline()
 			
@@ -217,8 +221,8 @@ def gen_fp_dataset(flen, opcode):
 							flags_dataset.append(flags_to_dec(l[len(l)-1]))
 			count=count+1
 			a=f.readline()
-	print("Iterated through",count,"lines of Test-cases in IBM Test Suite for",opcode,"opcode to extract",len(rs1_dataset),"Test-points!")
-
+	mess='Iterated through '+ str(count) + ' lines of Test-cases in IBM Test Suite for '+ str(opcode) +' opcode to extract '+str(len(rs1_dataset))+' Test-points!'
+	logger.info(mess)
 	if(ops==2):
 		#return rs1_dataset,rs2_dataset,rd_dataset,rm_dataset,te_dataset,flags_dataset
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,'',rm_dataset)

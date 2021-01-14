@@ -1,4 +1,6 @@
 # See LICENSE.incore for details
+# See LICENSE.iitm for details
+
 from math import *
 import riscv_isac.utils as utils
 import itertools
