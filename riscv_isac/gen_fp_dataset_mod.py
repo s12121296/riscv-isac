@@ -137,6 +137,7 @@ def gen_fp_dataset(flen, opcode):
 	count=0									# Initializing count of datapoints
 	path_parent = os.path.dirname(os.getcwd())
 	os.chdir(path_parent)
+	opcode=opcode.split(".")[0]
 	for filename in os.listdir(os.getcwd()+'/riscv_isac/test_suite'):
 		f=open(os.path.join(os.getcwd()+'/riscv_isac/test_suite', filename), "r")
 		for i in range(5):
