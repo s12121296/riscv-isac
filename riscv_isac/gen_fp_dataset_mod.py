@@ -1,6 +1,7 @@
 # See LICENSE.iitm for details
 
-from riscv_ctg.log import logger
+from riscv_isac.constants import *
+from riscv_isac.log import logger
 import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
@@ -138,8 +139,8 @@ def gen_fp_dataset(flen, opcode):
 	path_parent = os.path.dirname(os.getcwd())
 	os.chdir(path_parent)
 	opcode=opcode.split(".")[0]
-	for filename in os.listdir(os.getcwd()+'/riscv_isac/test_suite'):
-		f=open(os.path.join(os.getcwd()+'/riscv_isac/test_suite', filename), "r")
+	for filename in os.listdir(root+'/test_suite'):
+		f=open(os.path.join(root+'/test_suite', filename), "r")
 		for i in range(5):
 			a=f.readline()
 			
