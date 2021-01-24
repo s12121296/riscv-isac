@@ -49,7 +49,7 @@ def flags_to_dec(flags):								# Flags -> Decimal Equivalent
 	return(str(field_val));
 
 def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex representation
-
+	
 	if(float_no=="+Zero"):
 		th = "0x00000000"
 		return th
@@ -57,18 +57,19 @@ def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex repres
 		th = "0x80000000"
 		return th
 	elif(float_no=="+Inf"):
-		th = "0x7F800000"
+		th = "0x7f800000"
 		return th
 	elif(float_no=="-Inf"):
-		th = "0xFF800000"
+		th = "0xff800000"
 		return th
 	elif(float_no=="Q"):
-		th = "0xFF800001"
+		th = "0xff800001"
 		return th
 	elif(float_no=="S"):
-		return "0xFFFFFFFF"
+		return "0xff8fffff"
 	elif(float_no=="#"):
 		return "#"
+	num="N"
 	
 	a=float.fromhex(float_no)
 	sign=0
@@ -77,36 +78,42 @@ def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex repres
 	nor=float.hex(a)								# Normalized Number
 	
 	if(int(nor.split("p")[1])<-126):						# Checking Underflow of Exponent
-		if(sign==0):
-			return "0x00800000"
-		else:
-			return "0x80800000"
+			exp_bin=('0'*8)						# Exponent of Subnormal numbers
+			num="SN"
 	elif(int(nor.split("p")[1])>127):						# Checking Overflow of Exponent
 		if(sign==0):
-			return "0x7F7FFFFF"
+			return "0x7f7fffff"						# Most Positive Value
 		else:
-			return "0xFF7FFFFF"
+			return "0xff7fffff"						# Most Negative Value
 	else:										# Converting Exponent to 8-Bit Binary
 		exp=int(nor.split("p")[1])+127
 		exp_bin=('0'*(8-(len(bin(exp))-2)))+bin(exp)[2:]
 	
-	if(sign==0):
-		mant="0x"+nor.split("p")[0][4:]
+	if(num=="SN"):
+		mant="0x"+float_no.split("P")[0][3:]
 	else:
-		mant="0x"+nor.split("p")[0][5:]
+		if(sign==0):
+			mant="0x"+nor.split("p")[0][4:]
+		else:
+			mant="0x"+nor.split("p")[0][5:]
 
-	mant_bin=('0'*(52-(len(bin(int(mant,16)))-2)))+bin(int(mant,16))[2:]
+	mant_bin=bin(int(mant,16))[2:]+('0'*(52-(len(bin(int(mant,16)))-2)))
 	
 	binary="0b"
 	binary=binary+str(sign)+exp_bin+mant_bin[0:23]
 	
-	return(hex(int(binary,2)))
-	
+	hex_tp=hex(int(binary,2))
+	hex_tp=hex_tp.replace('0x','0x'+'0'*(10-len(hex_tp)))
+
+	return(hex_tp)
+
+		
 def coverpoints_format(ops, rs1=None, rs2=None, rs3=None, rm=None):
 	coverpoints = []
 	if(ops==2):
 		for i in range(len(rs1)):
 			coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i] + ' and ' + 'rm_val==' + rm[i])
+			#print(coverpoints[i])
 	elif(ops==1):
 		for i in range(len(rs1)):
 			coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rm_val==' + rm[i])
@@ -226,13 +233,10 @@ def gen_fp_dataset(flen, opcode):
 	mess='Iterated through '+ str(count) + ' lines of Test-cases in IBM Test Suite for '+ str(opcode) +' opcode to extract '+str(len(rs1_dataset))+' Test-points!'
 	logger.info(mess)
 	if(ops==2):
-		#return rs1_dataset,rs2_dataset,rd_dataset,rm_dataset,te_dataset,flags_dataset
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,'',rm_dataset)
 	elif(ops==1):
-		#return rs1_dataset,rd_dataset,rm_dataset,te_dataset,flags_dataset
 		cpts = coverpoints_format(ops,rs1_dataset,'','',rm_dataset)
 	elif(ops==3):
-		#return rs1_dataset,rs2_dataset,rs3_dataset,rd_dataset,rm_dataset,te_dataset,flags_dataset
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,rs3_dataset,rm_dataset)
 	return cpts
 
