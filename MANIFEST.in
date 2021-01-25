@@ -1,8 +1,9 @@
-include riscv_isac/LICENSE.incore
-include riscv_isac/LICENSE.iitm
-include riscv_isac/README.rst
+include LICENSE.incore
+include LICENSE.iitm
+include README.rst
 include riscv_isac/test_suite
 include riscv_isac/requirements.txt
 
+recursive-include riscv_isac/test_suite/*
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
