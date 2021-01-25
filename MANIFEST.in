@@ -1,6 +1,6 @@
-include LICENSE.incore
-include LICENSE.iitm
-include README.rst
+include riscv_isac/LICENSE.incore
+include riscv_isac/LICENSE.iitm
+include riscv_isac/README.rst
 include riscv_isac/test_suite
 include riscv_isac/requirements.txt
 
