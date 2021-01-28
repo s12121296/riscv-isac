@@ -226,7 +226,6 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     else:
         enable=True
     
-    #exit()
     # capture the operands and their values from the regfile
     if instr.rs1 is not None:
         rs1 = instr.rs1[0]
@@ -234,9 +233,6 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     if instr.rs2 is not None:
         rs2 = instr.rs2[0]
         rs2_type = instr.rs2[1]
-    if instr.instr_name == 'fadd.s':
-    	if instr.rm is not None:
-        	rm = instr.rm
     
     if instr.rd is not None:
         rd = instr.rd[0]
@@ -254,7 +250,7 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     if instr.instr_name in ['sw','sd','sh','sb','ld','lw','lwu','lh','lhu','lb', 'lbu','bgeu', 'bltu', 'sltiu', 'sltu','c.lw','c.ld','c.lwsp','c.ldsp','c.sw','c.sd','c.swsp','c.sdsp','mulhu','divu','remu','divuw','remuw']:
         rs1_val = struct.unpack(unsgn_sz, bytes.fromhex(arch_state.x_rf[rs1]))[0]
     elif rs1_type == 'x':
-        rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rd]))[0]
+        rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs1]))[0]
     elif rs1_type == 'f':
         rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs1]))[0]
         if(instr.instr_name == 'fadd.s'):
@@ -263,19 +259,23 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     if instr.instr_name in ['bgeu', 'bltu', 'sltiu', 'sltu', 'sll', 'srl', 'sra','mulhu','mulhsu','divu','remu','divuw','remuw']:
         rs2_val = struct.unpack(unsgn_sz, bytes.fromhex(arch_state.x_rf[rs2]))[0]
     elif rs2_type == 'x':
-        rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rd]))[0]
+        rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs2]))[0]
     elif rs2_type == 'f':
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs2]))[0]
         if(instr.instr_name == 'fadd.s'):
         	rs2_val = '0x' + (arch_state.f_rf[rs2]).lower()
-
-    arch_state.pc = instr.instr_addr
     
     if instr.instr_name in ['csrrwi']:
     	arch_state.fcsr = instr.zimm
     	
     if instr.instr_name in ['fadd.s']:
-    	rm_val = arch_state.fcsr
+         rm = instr.rm
+         if(rm==7):
+              rm_val = arch_state.fcsr
+         else:
+              rm_val = rm
+    
+    arch_state.pc = instr.instr_addr
     
     # the ea_align variable is used by the eval statements of the
     # coverpoints for conditional ops and memory ops
