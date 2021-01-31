@@ -253,7 +253,7 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
         rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs1]))[0]
     elif rs1_type == 'f':
         rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs1]))[0]
-        if(instr.instr_name == 'fadd.s'):
+        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
         	rs1_val = '0x' + (arch_state.f_rf[rs1]).lower()
 
     if instr.instr_name in ['bgeu', 'bltu', 'sltiu', 'sltu', 'sll', 'srl', 'sra','mulhu','mulhsu','divu','remu','divuw','remuw']:
@@ -262,13 +262,13 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs2]))[0]
     elif rs2_type == 'f':
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs2]))[0]
-        if(instr.instr_name == 'fadd.s'):
+        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
         	rs2_val = '0x' + (arch_state.f_rf[rs2]).lower()
     
     if instr.instr_name in ['csrrwi']:
     	arch_state.fcsr = instr.zimm
     	
-    if instr.instr_name in ['fadd.s']:
+    if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
          rm = instr.rm
          if(rm==7):
               rm_val = arch_state.fcsr
@@ -346,7 +346,7 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
                                 stats.covpt.append(str(coverpoints))
                                 cgf[cov_labels]['op_comb'][coverpoints] += 1
                     if 'val_comb' in value and len(value['val_comb']) != 0:
-                        if instr.instr_name in ['fadd.s']:
+                        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
       	                        val_key = fmt.coverpoints_format(2, rs1_val.split(), rs2_val.split(), '', str(rm_val).split())
       	                        if(val_key[0] in cgf[cov_labels]['val_comb']):
         	                        if cgf[cov_labels]['val_comb'][val_key[0]] == 0:
