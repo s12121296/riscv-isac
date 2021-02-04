@@ -200,9 +200,11 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     # assign default values to operands
     rs1 = 0
     rs2 = 0
+    rs3 = 0
     rd  = 0
     rs1_type = 'x'
     rs2_type = 'x'
+    rs3_type = 'f'
     rd_type = 'x'
 
     # create signed/unsigned conversion params
@@ -233,6 +235,9 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
     if instr.rs2 is not None:
         rs2 = instr.rs2[0]
         rs2_type = instr.rs2[1]
+    if instr.rs3 is not None:
+        rs3 = instr.rs3[0]
+        rs3_type = instr.rs3[1]
     
     if instr.rd is not None:
         rd = instr.rd[0]
@@ -253,7 +258,7 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
         rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs1]))[0]
     elif rs1_type == 'f':
         rs1_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs1]))[0]
-        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
+        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s"]:
         	rs1_val = '0x' + (arch_state.f_rf[rs1]).lower()
 
     if instr.instr_name in ['bgeu', 'bltu', 'sltiu', 'sltu', 'sll', 'srl', 'sra','mulhu','mulhsu','divu','remu','divuw','remuw']:
@@ -262,13 +267,16 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs2]))[0]
     elif rs2_type == 'f':
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs2]))[0]
-        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
+        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s","fmadd.s"]:
         	rs2_val = '0x' + (arch_state.f_rf[rs2]).lower()
+        	
+    if instr.instr_name in ["fmadd.s"]:
+        	rs3_val = '0x' + (arch_state.f_rf[rs3]).lower()
     
     if instr.instr_name in ['csrrwi']:
     	arch_state.fcsr = instr.zimm
     	
-    if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
+    if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s"]:
          rm = instr.rm
          if(rm==7):
               rm_val = arch_state.fcsr
@@ -332,6 +340,11 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
                             stats.ucovpt.append('rs2 : ' + 'f'+str(rs2))
                         stats.covpt.append('rs2 : ' + 'f'+str(rs2))
                         value['rs2']['f'+str(rs2)] += 1
+                    if 'rs3' in value and 'f'+str(rs3) in value['rs3']:
+                        if value['rs3']['f'+str(rs3)] == 0:
+                            stats.ucovpt.append('rs3 : ' + 'f'+str(rs3))
+                        stats.covpt.append('rs3 : ' + 'f'+str(rs3))
+                        value['rs3']['f'+str(rs3)] += 1
                     if 'rd' in value and is_rd_valid and 'f'+str(rd) in value['rd']:
                         if value['rd']['f'+str(rd)] == 0:
                             stats.ucovpt.append('rd : ' + 'f'+str(rd))
@@ -348,6 +361,20 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
                     if 'val_comb' in value and len(value['val_comb']) != 0:
                         if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s"]:
       	                        val_key = fmt.coverpoints_format(2, rs1_val.split(), rs2_val.split(), '', str(rm_val).split())
+      	                        if(val_key[0] in cgf[cov_labels]['val_comb']):
+        	                        if cgf[cov_labels]['val_comb'][val_key[0]] == 0:
+        	                            stats.ucovpt.append(str(val_key[0]))
+        	                        stats.covpt.append(str(val_key[0]))
+        	                        cgf[cov_labels]['val_comb'][val_key[0]] += 1
+                        elif instr.instr_name in ["fsqrt.s"]:
+      	                        val_key = fmt.coverpoints_format(1, rs1_val.split(), '', '', str(rm_val).split())
+      	                        if(val_key[0] in cgf[cov_labels]['val_comb']):
+        	                        if cgf[cov_labels]['val_comb'][val_key[0]] == 0:
+        	                            stats.ucovpt.append(str(val_key[0]))
+        	                        stats.covpt.append(str(val_key[0]))
+        	                        cgf[cov_labels]['val_comb'][val_key[0]] += 1
+                        elif instr.instr_name in ["fmadd.s"]:
+      	                        val_key = fmt.coverpoints_format(3, rs1_val.split(), rs2_val.split(), rs3_val.split(), str(rm_val).split())
       	                        if(val_key[0] in cgf[cov_labels]['val_comb']):
         	                        if cgf[cov_labels]['val_comb'][val_key[0]] == 0:
         	                            stats.ucovpt.append(str(val_key[0]))
