@@ -145,6 +145,38 @@ def stats(x):
 	#print()
 	return(len(d))	
 
+def unique_cpts(x):
+	d = {}
+	for i in range(len(x)):							# Returning a List Of Unique Coverpoints
+		if(d.get(x[i],"None") == "None"):
+			d[x[i]] = 1
+		else:
+			d[x[i]]+=1
+	return(list(d.keys()))
+	
+def rm_fix(x):	
+	rm= {}
+	for i in range(len(x)):
+		if(rm.get(x[i][len(x[i])-1],"None") == "None"):
+			rm[x[i][len(x[i])-1]] = 1
+		else:
+			rm[x[i][len(x[i])-1]]+= 1
+	l1 = x
+	l2 = []
+	if(rm.get(4,"None") == "None"):
+		for i in range(len(l1)):
+			if l1[i][len(l1[i])-1] == "3":
+				l2.append(l1[i].replace("=3","=4"))
+	'''x=l1+l2
+	rm={}
+	for i in range(len(x)):
+		if(rm.get(x[i][len(x[i])-1],"None") == "None"):
+			rm[x[i][len(x[i])-1]] = 1
+		else:
+			rm[x[i][len(x[i])-1]]+= 1
+	print(rm)'''
+	return (l1+l2)
+
 def gen_fp_dataset(flen, opcode):
 	opcode=opcode.lower()
 	rs1_dataset=[]									# Declaring empty datasets
@@ -157,7 +189,7 @@ def gen_fp_dataset(flen, opcode):
 	count=0									# Initializing count of datapoints
 	path_parent = os.path.dirname(os.getcwd())
 	os.chdir(path_parent)
-	#opcode=opcode.split(".")[0]
+	
 	for filename in os.listdir(root+'/test_suite'):
 		f=open(os.path.join(root+'/test_suite', filename), "r")
 		for i in range(5):
@@ -242,13 +274,19 @@ def gen_fp_dataset(flen, opcode):
 							flags_dataset.append(flags_to_dec(l[len(l)-1]))
 			count=count+1
 			a=f.readline()
-	mess='Iterated through '+ str(count) + ' lines of Test-cases in IBM Test Suite for '+ str(opcode) +' opcode to extract '+str(len(rs1_dataset))+' Test-points!'
-	logger.info(mess)
+		
 	if(ops==2):
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,'',rm_dataset)
 	elif(ops==1):
 		cpts = coverpoints_format(ops,rs1_dataset,'','',rm_dataset)
 	elif(ops==3):
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,rs3_dataset,rm_dataset)
+	
+	cpts = unique_cpts(cpts)
+	if opcode in ["fadd.s","fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fnmadd.s","fmsub.s","fnmsub.s","fcvt.w.s","fcvt.wu.s","fcvt.s.w","fcvt.s.wu"]:
+		cpts = rm_fix(cpts)
+	mess='Iterated through '+ str(count) + ' lines of Test-cases in IBM Test Suite for '+ str(opcode) +' opcode to extract '+str(len(cpts))+' Test-points!'
+	logger.info(mess)
+	
 	return cpts
 
