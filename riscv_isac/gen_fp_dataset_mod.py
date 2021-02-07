@@ -6,36 +6,43 @@ import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 	opcode_dict = {
-		'fadd'    : '+2',
-		'fsub'    : '-2',
-		'fmul'    : '*2',
-		'fdiv'    : '/2',
-		'fmadd'   : '*+3',
-		'fmsub'   : '*+3',
-		'fnmadd'  : '*+3',
-		'fnmsub'  : '*+3',
-		'fsqrt'   : 'V1',
-		'fmin'    : '<C2',
-		'fmax'    : '>C2',
+		'fadd.s'  : '+2',
+		'fsub.s'  : '-2',
+		'fmul.s'  : '*2',
+		'fdiv.s'  : '/2',
+		'fmadd.s' : '*+3',
+		'fmsub.s' : '*+3',
+		'fnmadd.s': '*+3',
+		'fnmsub.s': '*+3',
+		'fsqrt.s' : 'V1',
+		'fmin.s'  : '<C2',
+		'fmax.s'  : '>C2',
 		'fcvt.w.s': 'cfi1',
 		'fcvt.s.w': 'cif1',
 		'fmv.x.w' : 'cp1',
 		'fmv.w.x' : 'cp1',
-		'feq'     : '+2',
-		'flt'     : '+2',
-		'fle'     : '+2'
+		'feq.s'   : '+2',
+		'flt.s'   : '+2',
+		'fle.s'   : '+2'
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
-def rounding_mode(rm):									# Rounding Mode -> Decimal Equivalent
-	rm_dict = {
-		'=0' : '0',
-		'>'  : '3',
-		'<'  : '2',
-		'0'  : '1',
-		'=^' : '4'
-	}
-	return(rm_dict.get(rm))
+def rounding_mode(rm,opcode):									# Rounding Mode -> Decimal Equivalent
+	if opcode in ["fadd.s","fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fnmadd.s","fmsub.s","fnmsub.s","fcvt.w.s","fcvt.wu.s","fcvt.s.w","fcvt.s.wu"]:
+		rm_dict = {
+			'=0' : '0',
+			'>'  : '3',
+			'<'  : '2',
+			'0'  : '1',
+			'=^' : '4'
+		}
+		return(rm_dict.get(rm))
+	elif opcode in ["fmv.w.x","fle.s","fmv.x.w","fmin.s","fsgnj.s"]:
+		return('0')
+	elif opcode in ["fclass.s","flt.s","fmax.s","fsgnjn.s"]:
+		return('1')
+	elif opcode in ["feq.s","flw.s","fsw.s","fsgnjx.s"]:
+		return('2')
 	
 def flags_to_dec(flags):								# Flags -> Decimal Equivalent
 	field_val=0
@@ -112,8 +119,7 @@ def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex repres
 	hex_tp=hex_tp.replace('0x','0x'+'0'*(10-len(hex_tp)))
 
 	return(hex_tp)
-
-		
+	
 def coverpoints_format(ops, rs1=None, rs2=None, rs3=None, rm=None):
 	coverpoints = []
 	if(ops==2):
@@ -137,7 +143,7 @@ def stats(x):
 			d[x[i]]+=1
 	#print(d)
 	#print()
-	return(len(d))
+	return(len(d))	
 
 def gen_fp_dataset(flen, opcode):
 	opcode=opcode.lower()
@@ -151,7 +157,7 @@ def gen_fp_dataset(flen, opcode):
 	count=0									# Initializing count of datapoints
 	path_parent = os.path.dirname(os.getcwd())
 	os.chdir(path_parent)
-	opcode=opcode.split(".")[0]
+	#opcode=opcode.split(".")[0]
 	for filename in os.listdir(root+'/test_suite'):
 		f=open(os.path.join(root+'/test_suite', filename), "r")
 		for i in range(5):
@@ -174,7 +180,7 @@ def gen_fp_dataset(flen, opcode):
 			d_rm=l[1]
 			
 			if(sign==d_sign and flen==d_flen):			
-				rm_dataset.append(rounding_mode(d_rm))
+				rm_dataset.append(rounding_mode(d_rm,opcode))
 				if(ops==2):						
 					if(l[4]!='->'):			#b32+ =0 i +0.000001P-126 -1.7FFFFFP127 -> -1.7FFFFFP127 x
 						rs2_dataset.append(floatingPoint_tohex(l[4]))
