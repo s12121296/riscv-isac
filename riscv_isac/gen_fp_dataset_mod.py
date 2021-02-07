@@ -11,13 +11,19 @@ def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 		'fmul'    : '*2',
 		'fdiv'    : '/2',
 		'fmadd'   : '*+3',
+		'fmsub'   : '*+3',
+		'fnmadd'  : '*+3',
+		'fnmsub'  : '*+3',
 		'fsqrt'   : 'V1',
 		'fmin'    : '<C2',
 		'fmax'    : '>C2',
 		'fcvt.w.s': 'cfi1',
 		'fcvt.s.w': 'cif1',
 		'fmv.x.w' : 'cp1',
-		'fmv.w.x' : 'cp1'
+		'fmv.w.x' : 'cp1',
+		'feq'     : '+2',
+		'flt'     : '+2',
+		'fle'     : '+2'
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
