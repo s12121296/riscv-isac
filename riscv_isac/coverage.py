@@ -267,7 +267,7 @@ def compute_per_line(instr, mnemonic, commitvalue, cgf, xlen, addr_pairs,  sig_a
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.x_rf[rs2]))[0]
     elif rs2_type == 'f':
         rs2_val = struct.unpack(sgn_sz, bytes.fromhex(arch_state.f_rf[rs2]))[0]
-        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fmax.s","fmin.s"]:
+        if instr.instr_name in ['fadd.s',"fsub.s","fmul.s","fdiv.s","fmadd.s","fmax.s","fmin.s"]:
         	rs2_val = '0x' + (arch_state.f_rf[rs2]).lower()
         	
     if instr.instr_name in ["fmadd.s"]:
