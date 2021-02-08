@@ -122,16 +122,19 @@ def floatingPoint_tohex(float_no): 							# IEEE754 Floating point -> Hex repres
 	
 def coverpoints_format(ops, rs1=None, rs2=None, rs3=None, rm=None):
 	coverpoints = []
-	if(ops==2):
+	if(rm!=''):
+		if(ops==2):
+			for i in range(len(rs1)):
+				coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i] + ' and ' + 'rm_val==' + rm[i])
+		elif(ops==1):
+			for i in range(len(rs1)):
+				coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rm_val==' + rm[i])
+		elif(ops==3):
+			for i in range(len(rs1)):
+				coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i] + ' and ' + 'rs3_val==' + rs2[i] + ' and ' + 'rm_val==' + rm[i])
+	else:
 		for i in range(len(rs1)):
-			coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i] + ' and ' + 'rm_val==' + rm[i])
-			#print(coverpoints[i])
-	elif(ops==1):
-		for i in range(len(rs1)):
-			coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rm_val==' + rm[i])
-	elif(ops==3):
-		for i in range(len(rs1)):
-			coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i] + ' and ' + 'rs3_val==' + rs2[i] + ' and ' + 'rm_val==' + rm[i])
+				coverpoints.append('rs1_val=='+ rs1[i] + ' and ' + 'rs2_val==' + rs2[i])
 	return(coverpoints)
 
 def stats(x):
@@ -281,7 +284,10 @@ def gen_fp_dataset(flen, opcode):
 		cpts = coverpoints_format(ops,rs1_dataset,'','',rm_dataset)
 	elif(ops==3):
 		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,rs3_dataset,rm_dataset)
-	
+		
+	if opcode in ["feq.s","flt.s","fle.s"]:
+		cpts = coverpoints_format(ops,rs1_dataset,rs2_dataset,'','')
+
 	cpts = unique_cpts(cpts)
 	if opcode in ["fadd.s","fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fnmadd.s","fmsub.s","fnmsub.s","fcvt.w.s","fcvt.wu.s","fcvt.s.w","fcvt.s.wu"]:
 		cpts = rm_fix(cpts)
