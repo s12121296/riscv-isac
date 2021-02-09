@@ -6,24 +6,29 @@ import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 	opcode_dict = {
-		'fadd.s'  : '+2',
-		'fsub.s'  : '-2',
-		'fmul.s'  : '*2',
-		'fdiv.s'  : '/2',
-		'fmadd.s' : '*+3',
-		'fmsub.s' : '*+3',
-		'fnmadd.s': '*+3',
-		'fnmsub.s': '*+3',
-		'fsqrt.s' : 'V1',
-		'fmin.s'  : '<C2',
-		'fmax.s'  : '>C2',
-		'fcvt.w.s': 'cfi1',
-		'fcvt.s.w': 'cif1',
-		'fmv.x.w' : 'cp1',
-		'fmv.w.x' : 'cp1',
-		'feq.s'   : '+2',
-		'flt.s'   : '+2',
-		'fle.s'   : '+2'
+		'fadd.s'   : '+2',
+		'fsub.s'   : '-2',
+		'fmul.s'   : '*2',
+		'fdiv.s'   : '/2',
+		'fmadd.s'  : '*+3',
+		'fmsub.s'  : '*+3',
+		'fnmadd.s' : '*+3',
+		'fnmsub.s' : '*+3',
+		'fsqrt.s'  : 'V1',
+		'fmin.s'   : '<C2',
+		'fmax.s'   : '>C2',
+		'fcvt.w.s' : 'V1',
+		'fcvt.s.w' : 'V1',
+		'fmv.x.w'  : 'cp1',
+		'fmv.w.x'  : 'cp1',
+		'feq.s'    : '+2',
+		'flt.s'    : '+2',
+		'fle.s'    : '+2',
+		'fcvt.wu.s': 'V1',
+		'fcvt.s.wu': 'V1',
+		'fsgnj.s'  : '+2',
+		'fsgnjn.s' : '+2',
+		'fsgnjx.s' : '+2'
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
