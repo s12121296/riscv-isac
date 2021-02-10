@@ -28,7 +28,9 @@ def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 		'fcvt.s.wu': 'V1',
 		'fsgnj.s'  : '+2',
 		'fsgnjn.s' : '+2',
-		'fsgnjx.s' : '+2'
+		'fsgnjx.s' : '+2',
+		'flw.s'    : 'V1',
+		'fsw.s'    : 'V1'
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
