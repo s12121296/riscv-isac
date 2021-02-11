@@ -6,31 +6,32 @@ import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 	opcode_dict = {
-		'fadd.s'   : '+2',
-		'fsub.s'   : '-2',
-		'fmul.s'   : '*2',
-		'fdiv.s'   : '/2',
-		'fmadd.s'  : '*+3',
-		'fmsub.s'  : '*+3',
-		'fnmadd.s' : '*+3',
-		'fnmsub.s' : '*+3',
-		'fsqrt.s'  : 'V1',
-		'fmin.s'   : '<C2',
-		'fmax.s'   : '>C2',
-		'fcvt.w.s' : 'V1',
-		'fcvt.s.w' : 'V1',
-		'fmv.x.w'  : 'cp1',
-		'fmv.w.x'  : 'cp1',
-		'feq.s'    : '+2',
-		'flt.s'    : '+2',
-		'fle.s'    : '+2',
-		'fcvt.wu.s': 'V1',
-		'fcvt.s.wu': 'V1',
-		'fsgnj.s'  : '+2',
-		'fsgnjn.s' : '+2',
-		'fsgnjx.s' : '+2',
-		'flw.s'    : 'V1',
-		'fsw.s'    : 'V1'
+		'fadd.s'   : '+|2',
+		'fsub.s'   : '-|2',
+		'fmul.s'   : '*|2',
+		'fdiv.s'   : '/|2',
+		'fmadd.s'  : '*+|3',
+		'fmsub.s'  : '*+|3',
+		'fnmadd.s' : '*+|3',
+		'fnmsub.s' : '*+|3',
+		'fsqrt.s'  : 'V|1',
+		'fmin.s'   : '<C|2',
+		'fmax.s'   : '>C|2',
+		'fcvt.w.s' : 'V|1',
+		'fcvt.s.w' : 'V|1',
+		'fmv.x.w'  : 'cp|1',
+		'fmv.w.x'  : 'cp|1',
+		'feq.s'    : '+|2',
+		'flt.s'    : '+|2',
+		'fle.s'    : '+|2',
+		'fcvt.wu.s': 'V|1',
+		'fcvt.s.wu': 'V|1',
+		'fsgnj.s'  : '+|2',
+		'fsgnjn.s' : '+|2',
+		'fsgnjx.s' : '+|2',
+		'flw.s'    : 'V|1',
+		'fsw.s'    : 'V|1',
+		'fclass.s' : '?-,?n,?0,?s,?i,?N,?sN|1'
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
@@ -205,8 +206,9 @@ def gen_fp_dataset(flen, opcode):
 		if(sign_ops=="Invalid Opcode"):
 			print("Invalid Opcode!!!")
 			exit()
-		sign=sign_ops[0:len(sign_ops)-1]
-		ops=int(sign_ops[len(sign_ops)-1])
+		sign_ops=sign_ops.split('|')
+		sign=sign_ops[0].split(',')
+		ops=int(sign_ops[1])
 		if(flen!=32 and flen!=64):
 			print("Invalid flen value!!!")
 			exit()
@@ -217,7 +219,7 @@ def gen_fp_dataset(flen, opcode):
 			d_flen=int(l[0][1:3])
 			d_rm=l[1]
 			
-			if(sign==d_sign and flen==d_flen):			
+			if((d_sign in sign) and (flen==d_flen)):
 				rm_dataset.append(rounding_mode(d_rm,opcode))
 				if(ops==2):						
 					if(l[4]!='->'):			#b32+ =0 i +0.000001P-126 -1.7FFFFFP127 -> -1.7FFFFFP127 x
@@ -295,4 +297,3 @@ def gen_fp_dataset(flen, opcode):
 	logger.info(mess)
 	
 	return cpts
-
