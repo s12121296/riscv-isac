@@ -6,32 +6,32 @@ import os
 
 def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 	opcode_dict = {
-		'fadd.s'   : '+|2',
-		'fsub.s'   : '-|2',
-		'fmul.s'   : '*|2',
-		'fdiv.s'   : '/|2',
-		'fmadd.s'  : '*+|3',
-		'fmsub.s'  : '*+|3',
-		'fnmadd.s' : '*+|3',
-		'fnmsub.s' : '*+|3',
-		'fsqrt.s'  : 'V|1',
-		'fmin.s'   : '<C|2',
-		'fmax.s'   : '>C|2',
-		'fcvt.w.s' : 'V|1',
-		'fcvt.s.w' : 'V|1',
-		'fmv.x.w'  : 'cp|1',
-		'fmv.w.x'  : 'cp|1',
-		'feq.s'    : '+|2',
-		'flt.s'    : '+|2',
-		'fle.s'    : '+|2',
-		'fcvt.wu.s': 'V|1',
-		'fcvt.s.wu': 'V|1',
-		'fsgnj.s'  : '+|2',
-		'fsgnjn.s' : '+|2',
-		'fsgnjx.s' : '+|2',
-		'flw.s'    : 'V|1',
-		'fsw.s'    : 'V|1',
-		'fclass.s' : '?-,?n,?0,?s,?i,?N,?sN|1'
+		'fadd.s'   : {'+':2},
+		'fsub.s'   : {'-':2},
+		'fmul.s'   : {'*':2},
+		'fdiv.s'   : {'/':2},
+		'fmadd.s'  : {'*+':3},
+		'fmsub.s'  : {'*+':3},
+		'fnmadd.s' : {'*+':3},
+		'fnmsub.s' : {'*+':3},
+		'fsqrt.s'  : {'V':1},
+		'fmin.s'   : {'<C':2},
+		'fmax.s'   : {'>C':2},
+		'fcvt.w.s' : {'V':1},
+		'fcvt.s.w' : {'V':1},
+		'fmv.x.w'  : {'cp':1},
+		'fmv.w.x'  : {'cp':1},
+		'feq.s'    : {'+':2},
+		'flt.s'    : {'+':2},
+		'fle.s'    : {'+':2},
+		'fcvt.wu.s': {'V':1},
+		'fcvt.s.wu': {'V':1},
+		'fsgnj.s'  : {'+':2},
+		'fsgnjn.s' : {'~':1,'+':2},
+		'fsgnjx.s' : {'A':1,'+':2},
+		'flw.s'    : {'V':1},
+		'fsw.s'    : {'V':1},
+		'fclass.s' : {'?-':1,'?n':1,'?0':1,'?s':1,'?i':1,'?N':1,'?sN':1}
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
@@ -206,9 +206,6 @@ def gen_fp_dataset(flen, opcode):
 		if(sign_ops=="Invalid Opcode"):
 			print("Invalid Opcode!!!")
 			exit()
-		sign_ops=sign_ops.split('|')
-		sign=sign_ops[0].split(',')
-		ops=int(sign_ops[1])
 		if(flen!=32 and flen!=64):
 			print("Invalid flen value!!!")
 			exit()
@@ -219,7 +216,8 @@ def gen_fp_dataset(flen, opcode):
 			d_flen=int(l[0][1:3])
 			d_rm=l[1]
 			
-			if((d_sign in sign) and (flen==d_flen)):
+			if((d_sign in sign_ops) and (flen==d_flen)):
+				ops = sign_ops[d_sign]
 				rm_dataset.append(rounding_mode(d_rm,opcode))
 				if(ops==2):						
 					if(l[4]!='->'):			#b32+ =0 i +0.000001P-126 -1.7FFFFFP127 -> -1.7FFFFFP127 x
@@ -245,6 +243,8 @@ def gen_fp_dataset(flen, opcode):
 						rs1_dataset.append(floatingPoint_tohex(l[3]))
 						rd_dataset.append(floatingPoint_tohex(l[5]))
 						te_dataset.append(l[2])
+						if opcode in ['fsgnjn.s','fsgnjx.s']:
+							rs2_dataset.append(floatingPoint_tohex(l[3]))
 						if(len(l)-1==5):		#b32V =0 i +1.7FFFFFP127 -> +1.7FFFFFP63
 							flags_dataset.append('0')
 						else:				#b32V =0 i +1.7FFFFFP127 -> +1.7FFFFFP63 x
@@ -253,6 +253,8 @@ def gen_fp_dataset(flen, opcode):
 						rs1_dataset.append(floatingPoint_tohex(l[2]))
 						rd_dataset.append(floatingPoint_tohex(l[4]))
 						te_dataset.append("")
+						if opcode in ['fsgnjn.s','fsgnjx.s']:
+							rs2_dataset.append(floatingPoint_tohex(l[2]))
 						if(len(l)-1==4):		#b32V =0 +1.7FFFFFP127 -> +1.7FFFFFP63
 							flags_dataset.append('0')
 						else:				#b32V =0 +1.7FFFFFP127 -> +1.7FFFFFP63 x
@@ -297,3 +299,4 @@ def gen_fp_dataset(flen, opcode):
 	logger.info(mess)
 	
 	return cpts
+
