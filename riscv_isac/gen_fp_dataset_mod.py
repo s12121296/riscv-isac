@@ -31,12 +31,16 @@ def opcode_to_sign(opcode):								# Opcode -> Symbol present IBM Test Suite
 		'fsgnjx.s' : {'A':1,'+':2},
 		'flw.s'    : {'V':1},
 		'fsw.s'    : {'V':1},
-		'fclass.s' : {'?-':1,'?n':1,'?0':1,'?s':1,'?i':1,'?N':1,'?sN':1}
+		'fclass.s' : {'?-':1,'?n':1,'?0':1,'?s':1,'?i':1,'?N':1,'?sN':1},
+		'fcvt.l.s' : {'V':1},
+		'fcvt.lu.s': {'V':1},
+		'fcvt.s.l' : {'V':1},
+		'fcvt.s.lu': {'V':1}
 	}
 	return(opcode_dict.get(opcode,"Invalid Opcode"))
 
 def rounding_mode(rm,opcode):									# Rounding Mode -> Decimal Equivalent
-	if opcode in ["fadd.s","fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fnmadd.s","fmsub.s","fnmsub.s","fcvt.w.s","fcvt.wu.s","fcvt.s.w","fcvt.s.wu"]:
+	if opcode in ["fadd.s","fsub.s","fmul.s","fdiv.s","fsqrt.s","fmadd.s","fnmadd.s","fmsub.s","fnmsub.s","fcvt.w.s","fcvt.wu.s","fcvt.s.w","fcvt.s.wu","fcvt.s.lu","fcvt.s.l","fcvt.l.s","fcvt.lu.s"]:
 		rm_dict = {
 			'=0' : '0',
 			'>'  : '3',
